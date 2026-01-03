@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model admin_users {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password_hash String
+  role          String
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  last_login    DateTime?
+}
+
+model clients {
+  client_id      String           @id @default(cuid())
+  company_name   String?
+  client_name    String
+  email          String           @unique
+  status         String           @default("active")
+  api_key        String?
+  n8n_base_url   String?
+  agency_id      String?
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  setup_status   String           @default("pending")
+  client_users   client_users[]
+  retention_logs retention_logs[]
+  rfm_config     rfm_configs?
+}
+
+model rfm_configs {
+  id                String   @id @default(cuid())
+  client_id         String   @unique
+  recency_divisor   Int      @default(90)
+  frequency_divisor Int      @default(10)
+  monetary_divisor  Int      @default(1000)
+  recency_weight    Float    @default(0.4)
+  frequency_weight  Float    @default(0.3)
+  monetary_weight   Float    @default(0.3)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  client            clients  @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+}
+
+model client_users {
+  id                       String    @id @default(cuid())
+  client_id                String
+  email                    String
+  password_hash            String
+  role                     String    @default("client")
+  is_active                Boolean   @default(true)
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+  last_login               DateTime?
+  requires_password_change Boolean   @default(true)
+  clients                  clients   @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+
+  @@unique([client_id, email])
+  @@index([email])
+  @@map("client_users")
+}
+
+model retention_logs {
+  id                     String   @id @default(cuid())
+  customer_id            String
+  action                 String
+  timestamp              DateTime
+  status                 String
+  channel                String
+  churn_score            Float?
+  rfm_recency            Float?
+  rfm_frequency          Float?
+  rfm_monetary           Float?
+  campaign_variant       String?
+  customer_segment       String?
+  total_spent            Decimal? @db.Decimal(10, 2)
+  ab_test_group          String?
+  email_hash             String?
+  phone_hash             String?
+  client_id              String
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+  predicted_churn_reason String?
+  recommended_action     String?
+  action_triggered       Boolean  @default(false)
+  recovered_revenue      Decimal? @db.Decimal(10, 2)
+  client                 clients  @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+
+  // Single-field indexes
+  @@index([client_id])
+  @@index([timestamp])
+  @@index([churn_score])
+  
+  // Compound indexes - NO DUPLICATES
+  @@index([client_id, timestamp], map: "retention_logs_client_time_idx")
+  @@index([client_id, rfm_recency, rfm_frequency, rfm_monetary], map: "retention_logs_rfm_idx")
+  @@index([client_id, churn_score], map: "retention_logs_client_churn_idx")
+  @@index([client_id, status], map: "retention_logs_client_status_idx")
+  @@index([customer_id, client_id], map: "retention_logs_customer_client_idx")
+  @@index([client_id, timestamp, churn_score], map: "retention_logs_client_timestamp_churn_idx")
+  
+  @@map("retention_logs")
+}
+
+model DashboardSnapshot {
+  id          String   @id @default(cuid())
+  type        String   // admin | premium | client
+  subjectId   String?  // null = admin, client_id otherwise
+  version     Int
+  data        Json
+  sizeBytes   Int
+  createdAt   DateTime @default(now())
+
+  @@index([type, subjectId, createdAt])
+}

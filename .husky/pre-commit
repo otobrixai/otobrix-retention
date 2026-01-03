@@ -1,0 +1,9 @@
+// Create: .husky/pre-commit
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🧹 Running ESLint..."
+npm run lint
+
+echo "🔨 Running TypeScript check..."
+npx tsc --noEmit

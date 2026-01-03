@@ -1,0 +1,16 @@
+// src/components/providers/toast-provider.tsx
+'use client'
+
+import { Toaster } from 'sonner'
+
+export function ToastProvider() {
+  return (
+    <Toaster 
+      position="top-right"
+      expand={false}
+      richColors
+      closeButton
+      duration={4000}
+    />
+  )
+}

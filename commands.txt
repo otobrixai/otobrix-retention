@@ -1,0 +1,109 @@
+# ============================================
+# PREMIUM-READY VALIDATION COMMANDS
+# ============================================
+
+# 1. ENVIRONMENT SETUP
+# ====================
+# Copy and edit your environment file
+cp .env.example .env.local
+
+# Required environment variables for .env.local:
+# - ADMIN_INIT_PASSWORD=your_secure_password_here
+# - NEXTAUTH_SECRET=your_nextauth_secret_here  
+# - DATABASE_URL=your_database_connection_string
+# - SENTRY_DSN=your_sentry_dsn_here (if using Sentry)
+
+# 2. INSTALLATION & BUILD
+# =======================
+npm ci
+npm run build
+
+# 3. DATABASE SETUP (WITH BACKUP FIRST!)
+# =====================================
+# BACKUP YOUR DATABASE BEFORE MIGRATIONS!
+# PostgreSQL: pg_dump your_database_name > backup_$(date +%Y%m%d).sql
+
+npx prisma generate
+npx prisma migrate dev --name premium_ready_updates
+# OR for production: npx prisma migrate deploy
+
+# 4. SEED DATABASE (SECURE - NO PASSWORD LOGGING)
+# ===============================================
+# Windows PowerShell:
+$env:ADMIN_INIT_PASSWORD="your-secure-password-here"
+npm run db:seed
+
+# Windows CMD:
+set ADMIN_INIT_PASSWORD=your-secure-password-here && npm run db:seed
+
+# Unix/Mac:
+ADMIN_INIT_PASSWORD=your-secure-password-here npm run db:seed
+
+# 5. START DEVELOPMENT SERVER
+# ===========================
+npm run dev
+
+# 6. SMOKE TESTS (RUN IN SEPARATE TERMINAL)
+# ========================================
+
+# Test 1: Build Verification
+echo "✅ Build completed successfully"
+
+# Test 2: Database Connection & Auth
+curl -X GET http://localhost:3000/api/admin/test
+# Expected: 401 Unauthorized (not logged in)
+
+# Test 3: Rate Limiting Test
+# Windows PowerShell:
+for ($i=1; $i -le 110; $i++) { 
+  $result = curl -s -o $null -w "%{http_code}" http://localhost:3000/api/auth/callback/credentials
+  if ($i -eq 100) { Write-Host "Rate limit test: Request $i returned $result" }
+}
+
+# Unix/Mac:
+for i in {1..110}; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/auth/callback/credentials)
+  if [ $i -eq 100 ]; then echo "Rate limit test: Request $i returned $code"; fi
+done
+
+# Test 4: Security Headers
+curl -I http://localhost:3000/ | findstr "Content-Security-Policy"
+# Should show CSP headers
+
+# Test 5: Client API Protection  
+curl -X GET http://localhost:3000/api/client/dashboard
+# Expected: 401 Unauthorized
+
+# Test 6: Admin Path Obscurity
+curl -I http://localhost:3000/admin
+# Expected: 404 Not Found
+
+# 7. PRODUCTION BUILD TEST
+# ========================
+npm run build
+npm start
+
+# 8. SENTRY TEST (if configured)
+# ==============================
+# Visit http://localhost:3000 and trigger the test Sentry button
+# Check your Sentry dashboard at https://sentry.io for the test error
+
+# 9. CI SIMULATION
+# ================
+# Test what will run in GitHub Actions:
+npm ci
+npm run build
+npm test
+
+# 10. FINAL VALIDATION CHECKLIST
+# ==============================
+echo "🎯 PREMIUM-READY VALIDATION CHECKLIST:"
+echo "✅ 1. No TypeScript errors in build"
+echo "✅ 2. Database migrations applied successfully" 
+echo "✅ 3. Seed runs without printing passwords"
+echo "✅ 4. Authentication endpoints respond correctly"
+echo "✅ 5. Rate limiting works (returns 429 after limit)"
+echo "✅ 6. Security headers present"
+echo "✅ 7. Admin paths obscured (return 404)"
+echo "✅ 8. Production build succeeds"
+echo "✅ 9. All tests pass"

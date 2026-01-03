@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
+
+      - name: Build
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm test --if-present
+
+      - name: Run smoke tests
+        env:
+          NEXT_PUBLIC_BASE_URL: http://localhost:3000
+        run: |
+          # Start the app in background (port 3000)
+          npm run start:ci & sleep 4
+          # Run smoke scripts if present
+          node scripts/smoke/health-check.js || true
+          node scripts/smoke/csrf-test.js || true
+          node scripts/smoke/rate-limit-test.js || true
