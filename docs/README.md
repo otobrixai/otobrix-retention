@@ -1,4 +1,4 @@
-# Otobrix Admin Dashboard
+# Otobrix Retention Dashboard
 
 ![CI Pipeline](https://github.com/your-username/otobrix-retention/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://codecov.io/gh/your-username/otobrix-retention/branch/main/graph/badge.svg)
