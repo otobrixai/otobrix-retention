@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  trailingSlash: false,
   // ✅ Fix 1: reactCompiler is now a top-level key (moved from experimental)
   reactCompiler: false, // Or true, if you want to enable it
 
