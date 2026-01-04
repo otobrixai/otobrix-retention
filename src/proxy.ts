@@ -118,7 +118,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/api/:path*',
-    // Skip rate limiting for health checks and static files
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
 }
