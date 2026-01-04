@@ -32,6 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         path: '/',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60, // 24 hours
+        domain: process.env.NODE_ENV === 'production' ? '.otobrixai.com' : undefined,
       },
     },
     callbackUrl: {
