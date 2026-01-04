@@ -1,6 +1,6 @@
 // src/app/page.tsx - UPDATED
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'  // Direct import from your auth.ts
+import { auth } from '@/lib/auth'
 import ClientLoginForm from '@/components/ClientLoginForm'
 
 export default async function Home() {
