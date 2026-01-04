@@ -4,7 +4,13 @@ import { auth } from '@/lib/auth'
 import ClientLoginForm from '@/components/ClientLoginForm'
 
 export default async function Home() {
+  console.log('DEBUG: Homepage executing at', new Date().toISOString())
+  
   const session = await auth()
+  console.log('DEBUG: Session result:', { 
+    hasSession: !!session, 
+    userType: (session?.user as any)?.type 
+  })
 
   if (session?.user) {
     const user = session.user as {
