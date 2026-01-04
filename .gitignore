@@ -51,3 +51,5 @@ Thumbs.db
 # Prisma
 prisma/dev.db
 prisma/*.db-journal
+.vercel
+.env*.local
