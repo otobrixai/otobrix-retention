@@ -20,7 +20,7 @@
   "redirects": [
     { 
       "source": "/", 
-      "destination": "https://automation.otobrixai.com", 
+      "destination": "https://retention.otobrixai.com", 
       "permanent": true 
     }
   ],
