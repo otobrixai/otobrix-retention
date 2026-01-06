@@ -8,41 +8,17 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     steps:
-      - name: Install jq (JSON parser)
-        run: sudo apt-get update && sudo apt-get install -y jq
-        
-      - name: Generate and Notify
+      - name: Generate Snapshot
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -s -H "Authorization: Bearer $CRON_SECRET" https://retention.otobrixai.com/api/cron/snapshot
+      
+      - name: Notify Telegram
+        env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: "5026996405"
         run: |
-          # Get and parse response
-          RESPONSE=$(curl -s -H "Authorization: Bearer $CRON_SECRET" https://retention.otobrixai.com/api/cron/snapshot)
-          
-          # Parse with jq
-          TIMESTAMP=$(echo $RESPONSE | jq -r '.timestamp')
-          DURATION=$(echo $RESPONSE | jq -r '.duration')
-          TOTAL_CLIENTS=$(echo $RESPONSE | jq -r '.stats.totalClients')
-          ACTIVE_CLIENTS=$(echo $RESPONSE | jq -r '.stats.activeClients')
-          TOTAL_USERS=$(echo $RESPONSE | jq -r '.stats.totalClientUsers')
-          
-          # Format message
-          MESSAGE="🏢 *Admin Dashboard Snapshot* 
-          
-📈 *Dashboard Metrics*
-⏱️  Execution: ${DURATION}ms
-👥 Total Clients: ${TOTAL_CLIENTS}
-✅ Active Clients: ${ACTIVE_CLIENTS}
-👤 Client Users: ${TOTAL_USERS}
-🕐 Generated: ${TIMESTAMP}
-          
-🔄 *Schedule*
-• Runs: Every 6 hours
-• Status: ✅ Operational"
-          
-          # Send to Telegram
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${MESSAGE}" \
-            -d "parse_mode=Markdown"
+            -d "text=✅ Admin snapshot completed"
