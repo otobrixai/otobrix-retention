@@ -1,0 +1,33 @@
+name: Admin Dashboard Snapshot
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours at minute 0
+  workflow_dispatch:        # Manual trigger button
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Admin Snapshot
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          # Make the API call
+          response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $CRON_SECRET" \
+            https://retention.otobrixai.com/api/cron/snapshot)
+          
+          # Split response and status code
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n -1)
+          
+          echo "HTTP Status Code: $http_code"
+          echo "Response:"
+          echo "$body"
+          
+          # Check if successful
+          if [ "$http_code" = "200" ]; then
+            echo "✅ Snapshot generated successfully"
+          else
+            echo "❌ Failed to generate snapshot"
+            exit 1
+          fi
