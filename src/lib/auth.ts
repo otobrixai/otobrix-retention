@@ -14,7 +14,6 @@ const emailSchema = z.string()
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV === 'development',
-  trustHost: true,
   basePath: "/api/auth",
   
   session: {
