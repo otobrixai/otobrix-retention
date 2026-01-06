@@ -14,8 +14,6 @@ const emailSchema = z.string()
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV === 'development',
-  basePath: "/api/auth",
-  
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours (reduced from 30 days for security)
