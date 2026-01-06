@@ -8,17 +8,31 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate Snapshot
+      - name: Generate and Notify
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          curl -s -H "Authorization: Bearer $CRON_SECRET" https://retention.otobrixai.com/api/cron/snapshot
-      
-      - name: Notify Telegram
-        env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: "5026996405"
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=✅ Admin snapshot completed"
+          RESPONSE=$(curl -s -H "Authorization: Bearer $CRON_SECRET" https://retention.otobrixai.com/api/cron/snapshot)
+          
+          DURATION=$(echo "$RESPONSE" | grep -o '"duration":[0-9]*' | cut -d: -f2)
+          TOTAL=$(echo "$RESPONSE" | grep -o '"totalClients":[0-9]*' | cut -d: -f2)
+          ACTIVE=$(echo "$RESPONSE" | grep -o '"activeClients":[0-9]*' | cut -d: -f2)
+          USERS=$(echo "$RESPONSE" | grep -o '"totalClientUsers":[0-9]*' | cut -d: -f2)
+          TIMESTAMP=$(echo "$RESPONSE" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4 | cut -d'T' -f1,2 | cut -d'.' -f1)
+          
+          MESSAGE="Admin Snapshot Complete
+          
+          Stats:
+          - Duration: ${DURATION}ms
+          - Clients: ${TOTAL}
+          - Active: ${ACTIVE}
+          - Users: ${USERS}
+          - Time: ${TIMESTAMP}Z
+          
+          Next run: 6 hours"
+          
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" -d "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "text=${MESSAGE}"
+          
+          echo "Done"
