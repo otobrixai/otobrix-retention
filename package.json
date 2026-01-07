@@ -7,12 +7,11 @@
     "lint": "next lint",
     "build": "npx prisma generate && next build",
     "dev": "next dev",
-    "start": "next start",
-    "postinstall": "npx prisma generate"
+    "start": "next start"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/adapter-pg": "6.19.1",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
