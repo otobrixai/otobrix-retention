@@ -1,7 +1,7 @@
 // src/components/test/DeduplicationTest.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function DeduplicationTest() {

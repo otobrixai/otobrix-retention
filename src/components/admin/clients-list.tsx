@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
@@ -43,8 +43,6 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
   const queryClient = useQueryClient()
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)  
 
   // Debounce search input
   useEffect(() => {
@@ -77,7 +75,6 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
 
   // Optimistic delete function
   const deleteClient = async (clientId: string) => {
-    setIsDeleting(true)
     const previousClients = queryClient.getQueryData(['clients', debouncedSearch])
     
     // Optimistic update
@@ -97,28 +94,13 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
       toast.success('Client deleted successfully')
       // Refresh the list
       queryClient.invalidateQueries({ queryKey: ['clients'] })
-    } catch (error) {
+    } catch (_error) {
       // Revert on error
       queryClient.setQueryData(['clients', debouncedSearch], previousClients)
       toast.error('Failed to delete client')
-    } finally {
-      setIsDeleting(false)
     }
   }
 
-  // Helper to get badge variant
-  const getStatusVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'default'
-      case 'inactive':
-        return 'secondary'
-      case 'suspended':
-        return 'destructive'
-      default:
-        return 'outline'
-    }
-  }
 
   if (clients.length === 0 && !debouncedSearch) {
     return (

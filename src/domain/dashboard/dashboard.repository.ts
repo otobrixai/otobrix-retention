@@ -160,17 +160,17 @@ export class DashboardRepository {
     });
 
     // Calculate totals
-    const totalRevenueRecovered = clientStats.reduce((acc: any, stat: any) => {
+    const totalRevenueRecovered = clientStats.reduce((acc: number, stat: typeof clientStats[0]) => {
       return acc + Number(stat._sum?.recovered_revenue || 0);
     }, 0);
 
-    const highRiskCustomers = clientStats.reduce((acc: any, stat: any) => {
+    const highRiskCustomers = clientStats.reduce((acc: number, stat: typeof clientStats[0]) => {
       return acc + (stat._count?._all || 0);
     }, 0);
 
     // Map client performance data
-    const clientPerformance = clients.map((client: any) => {
-      const stats = clientStats.find((stat: any) => stat.client_id === client.client_id);
+    const clientPerformance = clients.map((client: typeof clients[0]) => {
+      const stats = clientStats.find((stat: typeof clientStats[0]) => stat.client_id === client.client_id);
       return {
         clientId: client.client_id,
         companyName: client.company_name || client.client_name,
@@ -199,7 +199,7 @@ export class DashboardRepository {
     });
 
     // Transform recent activity
-    const transformedActivity = recentActivity.map((activity: any) => ({
+    const transformedActivity = recentActivity.map((activity: typeof recentActivity[0]) => ({
       id: activity.id,
       clientName: activity.client.company_name || activity.client.client_name,
       customerId: activity.customer_id,

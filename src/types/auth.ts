@@ -21,7 +21,7 @@ declare module "next-auth" {
     role: string
     clientId?: string
     clientName?: string
-    branding?: any
+    branding?: unknown
     requiresPasswordChange?: boolean
   }
 }

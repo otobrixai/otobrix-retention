@@ -36,7 +36,7 @@ export async function GET() {
       await prisma.$queryRaw`SELECT 1`
       dbResponseTime = Date.now() - dbStart
       dbHealth = true
-    } catch (error) {
+    } catch (_error) {
       dbHealth = false
     }
 

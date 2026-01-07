@@ -16,10 +16,15 @@ export async function GET() {
       generatedAt: new Date().toISOString()
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API ERROR] Rate limit stats fetch failed');
     
-    if (error.message === 'Unauthorized') {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      (error as { message?: unknown }).message === 'Unauthorized'
+    ) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     

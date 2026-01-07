@@ -81,7 +81,7 @@ export async function POST(
       )
     }
 
-    console.log(`Access email sent to: ${clientUser.email}`)
+    console.info(`Access email sent to: ${clientUser.email}`)
 
     return NextResponse.json({
       success: true,

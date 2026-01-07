@@ -1,7 +1,7 @@
 // src/app/set-password/page.tsx
 'use client'
 
-import { useSession, signIn, signOut } from 'next-auth/react' // Add signOut import
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Eye, EyeOff, Key } from 'lucide-react'
@@ -18,7 +18,13 @@ export default function SetPasswordPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      const sessionUser = session.user as any
+      type SessionUser = {
+        requiresPasswordChange?: boolean
+        type?: string
+        clientId?: string
+        // add other properties as needed
+      }
+      const sessionUser = session.user as SessionUser
       if (!sessionUser.requiresPasswordChange) {
         // If password already changed, redirect to dashboard
         if (sessionUser.type === 'client' && sessionUser.clientId) {
@@ -46,7 +52,13 @@ export default function SetPasswordPage() {
     return null
   }
 
-  const sessionUser = session?.user as any
+  type SessionUser = {
+    requiresPasswordChange?: boolean
+    type?: string
+    clientId?: string
+    // add other properties as needed
+  }
+  const sessionUser = session?.user as SessionUser
   if (!sessionUser?.requiresPasswordChange) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -103,7 +115,7 @@ export default function SetPasswordPage() {
       } else {
         setError(data.error || 'Failed to set password')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('An error occurred while setting password')
     } finally {
       setLoading(false)

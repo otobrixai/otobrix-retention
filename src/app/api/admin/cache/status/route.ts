@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { cacheManager } from '@/lib/cache/redis';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await auth();
     
@@ -26,11 +26,11 @@ export async function GET(request: Request) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { 
         status: 'error',
-        error: error.message 
+        error: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

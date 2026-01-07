@@ -67,11 +67,11 @@ export async function POST(
       }
     })
 
-    console.log(`Password reset for client: ${clientId}, temp password: ${tempPassword}`)
+    console.info(`Password reset for client: ${clientId}, temp password: ${tempPassword}`)
 
     // Send email with temporary password
     const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password`
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: 'OtoRetain Pro <support@otobrixai.com>',
       to: client.client_users[0].email,
       subject: 'Password Reset - Temporary Password',
@@ -95,10 +95,10 @@ export async function POST(
     if (error) {
       console.error('Resend error:', error)
       // Still return success but log the email failure
-      console.log(`Password reset for client: ${clientId}, but email failed to send. Temp password: ${tempPassword}`)
+      console.info(`Password reset for client: ${clientId}, but email failed to send. Temp password: ${tempPassword}`)
     }
 
-    console.log(`Password reset email sent to: ${client.client_users[0].email}`)
+    console.info(`Password reset email sent to: ${client.client_users[0].email}`)
 
     return NextResponse.json({
       success: true,

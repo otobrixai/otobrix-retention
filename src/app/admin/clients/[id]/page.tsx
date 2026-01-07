@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, User, Mail, Building, Shield, Key, Send, Edit, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Key, Send, Edit, AlertTriangle } from 'lucide-react';
 
 interface Account {
   client_id: string;
@@ -57,8 +57,9 @@ export default function AccountDetailPage() {
         
         const data = await response.json();
         setAccount(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load account details');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load account details';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

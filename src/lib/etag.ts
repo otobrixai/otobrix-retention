@@ -1,5 +1,5 @@
 // Edge-compatible ETag generator
-export function generateEtag(data: any): string {
+export function generateEtag(data: unknown): string {
   const str = typeof data === 'string' ? data : JSON.stringify(data);
   
   // Simple hash function that works in Edge Runtime

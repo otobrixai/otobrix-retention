@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // TODO: Implement actual agency signup logic
     // This should create an agency record in the database
     
-    console.log('🆕 Agency signup request:', body);
+    console.info('🆕 Agency signup request:', body);
 
     return NextResponse.json({
       success: true,
@@ -28,10 +28,15 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error processing agency signup:', error);
+    const errorMessage =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? (error as { message?: string }).message
+        : undefined;
+
     return NextResponse.json(
-      { error: error.message || 'Failed to process signup' },
+      { error: errorMessage || 'Failed to process signup' },
       { status: 500 }
     );
   }

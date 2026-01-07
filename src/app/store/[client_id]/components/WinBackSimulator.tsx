@@ -7,15 +7,22 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Zap } from 'lucide-react';
 
+interface ROIData {
+  roi?: {
+    totalAtRiskRevenue?: number;
+  };
+}
+
 interface WinBackSimulatorProps {
-  data: any;
+  data: unknown;
   onLaunch: (action: string) => void;
 }
 
 export default function WinBackSimulator({ data, onLaunch }: WinBackSimulatorProps) {
   const [recoveryRate, setRecoveryRate] = useState([35]);
   
-  const atRiskRevenue = data.roi?.totalAtRiskRevenue || 100000;
+  const safeData = data as ROIData;
+  const atRiskRevenue = safeData.roi?.totalAtRiskRevenue || 100000;
   const projectedRevenue = atRiskRevenue * (recoveryRate[0] / 100);
 
   return (

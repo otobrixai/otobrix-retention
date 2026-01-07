@@ -19,25 +19,26 @@ const logger = pino({
 
 // Simple logger methods that don't use worker threads
 export const Logger = {
-  info: (message: string, data?: any, context?: string) => {
-    const logData: any = { ...data };
+  info: (message: string, data?: Record<string, unknown>, context?: string) => {
+    const logData: Record<string, unknown> = { ...data };
     if (context) logData.context = context;
     logger.info(logData, message);
   },
   
-  error: (message: string, error?: any, context?: string) => {
-    const logData: any = {};
+   error: (message: string, error?: unknown, context?: string) => {
+    const logData: Record<string, unknown> = {};
     if (context) logData.context = context;
     
     if (error instanceof Error) {
-      logData.err = {
+      const errorData: Record<string, unknown> = {
         message: error.message,
         name: error.name
       };
       // Only include stack in development
       if (process.env.NODE_ENV !== 'production') {
-        logData.err.stack = error.stack;
+        errorData.stack = error.stack;
       }
+      logData.err = errorData;
     } else if (error) {
       logData.err = error;
     }
@@ -45,14 +46,14 @@ export const Logger = {
     logger.error(logData, message);
   },
   
-  warn: (message: string, data?: any, context?: string) => {
-    const logData: any = { ...data };
+  warn: (message: string, data?: Record<string, unknown>, context?: string) => {
+    const logData: Record<string, unknown> = { ...data };
     if (context) logData.context = context;
     logger.warn(logData, message);
   },
   
-  debug: (message: string, data?: any, context?: string) => {
-    const logData: any = { ...data };
+  debug: (message: string, data?: Record<string, unknown>, context?: string) => {
+    const logData: Record<string, unknown> = { ...data };
     if (context) logData.context = context;
     logger.debug(logData, message);
   }
@@ -65,7 +66,7 @@ export function generateRequestId(): string {
 
 // Simple child logger creator
 export function createLogger(context: string, requestId?: string) {
-  const childConfig: any = { context };
+  const childConfig: Record<string, unknown> = { context };
   if (requestId) childConfig.requestId = requestId;
   return logger.child(childConfig);
 }

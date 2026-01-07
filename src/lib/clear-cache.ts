@@ -2,11 +2,11 @@
 import { cacheManager } from './cache/redis';
 
 export async function clearAllCache() {
-  console.log('🧹 Clearing ALL cache entries...');
+  console.info('🧹 Clearing ALL cache entries...');
   
   try {
     await cacheManager.clear();
-    console.log('✅ All cache cleared successfully');
+    console.info('✅ All cache cleared successfully');
   } catch (error) {
     console.error('❌ Error clearing cache:', error);
   }

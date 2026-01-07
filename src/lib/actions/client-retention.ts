@@ -27,7 +27,7 @@ interface RetentionLog {
   predicted_churn_reason: string | null;
   recommended_action: string | null;
   action_triggered: boolean;
-  recovered_revenue: any; // Using any since Decimal can be complex
+  recovered_revenue: unknown;
 }
 
 interface ClientData {

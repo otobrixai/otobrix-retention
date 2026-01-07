@@ -1,9 +1,8 @@
 ﻿// src/app/api/client/dashboard/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/auth'
-import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
     
@@ -38,10 +37,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(dashboardData);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error fetching client dashboard data:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch dashboard data' },
+      { error: (typeof error === 'object' && error !== null && 'message' in error) ? (error as { message: string }).message : 'Failed to fetch dashboard data' },
       { status: 500 }
     );
   }

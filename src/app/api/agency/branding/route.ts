@@ -1,6 +1,5 @@
 ﻿// src/app/api/agency/branding/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,16 +30,20 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(mockBranding);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error fetching branding:', error);
+    const errorMessage =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? (error as { message?: string }).message
+        : undefined;
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch branding' },
+      { error: errorMessage || 'Failed to fetch branding' },
       { status: 500 }
     );
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   return NextResponse.json(
     { error: 'Method not implemented' },
     { status: 501 }
