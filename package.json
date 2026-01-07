@@ -5,7 +5,7 @@
     "type":  "module",
     "scripts":  {
                     "lint":  "next lint",
-                    "build":  "prisma generate \u0026\u0026 next build",
+                    "build":  "next build",
                     "dev":  "next dev",
                     "postinstall":  "prisma generate",
                     "start":  "next start"
