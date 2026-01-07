@@ -4,8 +4,9 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
 
-// Initialize Resend (make sure you have RESEND_API_KEY in your .env)
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Safe initialization of Resend
+const resendApiKey = process.env.RESEND_API_KEY
+const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 export async function POST(
   request: NextRequest,
@@ -14,7 +15,18 @@ export async function POST(
   try {
     // Verify admin authentication
     const session = await auth()
-    
+
+    // Check if Resend is configured
+    if (!resend) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'Email service not configured',
+          message: 'RESEND_API_KEY is missing. Email service is unavailable.'
+        },
+        { status: 503 }
+      )
+    }
     if (!session?.user || session.user.type !== 'admin') {
       return NextResponse.json(
         { error: 'Unauthorized' },
