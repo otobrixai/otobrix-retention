@@ -1,9 +1,7 @@
 ﻿/* global __ENV */
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Trend } from "k6/metrics";
 
-const dashboardLatency = new Trend("dashboard_latency_ms");
 
 // SIMPLE options for smoke test
 export let options = {

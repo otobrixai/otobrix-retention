@@ -1,6 +1,6 @@
 // scripts/worker.ts - Enhanced with TypeScript types
-const { Redis } = require('@upstash/redis');
-const { PrismaClient } = require('@prisma/client');
+import { Redis } from '@upstash/redis';
+import { PrismaClient } from '@prisma/client';
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -55,7 +55,7 @@ interface SnapshotData {
 async function generateSnapshotWithRetry(clientId: string, maxRetries: number = 3): Promise<SnapshotData | null> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Generating snapshot for client ${clientId}, attempt ${attempt}`);
+      console.info(`Generating snapshot for client ${clientId}, attempt ${attempt}`);
       
       // Simulate snapshot generation - replace with actual logic
       const snapshot: SnapshotData = {
@@ -98,11 +98,11 @@ async function generateSnapshotWithRetry(clientId: string, maxRetries: number = 
       }
 
       if (cacheSuccess) {
-        console.log(`✅ Successfully generated and cached snapshot for client ${clientId}`);
+        console.info(`✅ Successfully generated and cached snapshot for client ${clientId}`);
         return snapshot;
       }
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Attempt ${attempt} failed for client ${clientId}:`, error);
       
       if (attempt === maxRetries) {
@@ -111,7 +111,7 @@ async function generateSnapshotWithRetry(clientId: string, maxRetries: number = 
       
       // Exponential backoff
       const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-      console.log(`Retrying in ${backoffDelay}ms...`);
+      console.info(`Retrying in ${backoffDelay}ms...`);
       await new Promise(resolve => setTimeout(resolve, backoffDelay));
     }
   }
@@ -127,12 +127,12 @@ async function warmupSnapshots(): Promise<void> {
   const hasLock = await acquireLock(lockKey, 300); // 5 minute lock
   
   if (!hasLock) {
-    console.log('Another worker is already generating snapshots, skipping...');
+    console.info('Another worker is already generating snapshots, skipping...');
     return;
   }
 
   try {
-    console.log('🚀 Starting snapshot warmup...');
+    console.info('🚀 Starting snapshot warmup...');
     const warmupStart = Date.now();
 
     // Get active clients - with retry for DB cold starts
@@ -155,7 +155,7 @@ async function warmupSnapshots(): Promise<void> {
       });
     }
 
-    console.log(`Generating snapshots for ${clients.length} clients...`);
+    console.info(`Generating snapshots for ${clients.length} clients...`);
 
     // Generate snapshots in parallel with concurrency limit
     const concurrencyLimit = 3;
@@ -184,19 +184,19 @@ async function warmupSnapshots(): Promise<void> {
     const failed = results.filter(r => r === null).length;
     
     const duration = Date.now() - warmupStart;
-    console.log(`✅ Warmup completed in ${duration}ms: ${successful} successful, ${failed} failed`);
+    console.info(`✅ Warmup completed in ${duration}ms: ${successful} successful, ${failed} failed`);
 
   } catch (error) {
     console.error('❌ Warmup failed:', error);
   } finally {
     await releaseLock(lockKey);
-    console.log('🔓 Released worker lock');
+    console.info('🔓 Released worker lock');
   }
 }
 
 // Main worker loop
 async function main(): Promise<void> {
-  console.log('🔄 Starting snapshot worker...');
+  console.info('🔄 Starting snapshot worker...');
   
   while (true) {
     try {
@@ -206,20 +206,20 @@ async function main(): Promise<void> {
     }
     
     // Wait 2 minutes before next run
-    console.log('💤 Sleeping for 2 minutes...');
+    console.info('💤 Sleeping for 2 minutes...');
     await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
   }
 }
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('🛑 Received SIGTERM, shutting down gracefully...');
+  console.info('🛑 Received SIGTERM, shutting down gracefully...');
   await prisma.$disconnect();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('🛑 Received SIGINT, shutting down gracefully...');
+  console.info('🛑 Received SIGINT, shutting down gracefully...');
   await prisma.$disconnect();
   process.exit(0);
 });

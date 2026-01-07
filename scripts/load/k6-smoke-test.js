@@ -12,7 +12,8 @@ export const options = {
   },
 };
 
-const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
+// eslint-disable-next-line no-undef
+const BASE_URL = __ENV.BASE_URL || "http://retention.otobrixai.com";
 
 export default function () {
   // Test the simple endpoint

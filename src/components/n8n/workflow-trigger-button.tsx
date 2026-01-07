@@ -15,7 +15,7 @@ interface WorkflowTriggerButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon'
   className?: string
   icon?: React.ReactNode
-  onSuccess?: (data: any) => void
+  onSuccess?: (data: unknown) => void
   onError?: (error: Error) => void
 }
 
