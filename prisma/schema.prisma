@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model admin_users {
@@ -93,30 +93,19 @@ model retention_logs {
   recovered_revenue      Decimal? @db.Decimal(10, 2)
   client                 clients  @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
 
-  // Single-field indexes
-  @@index([client_id])
-  @@index([timestamp])
-  @@index([churn_score])
-  
-  // Compound indexes - NO DUPLICATES
   @@index([client_id, timestamp], map: "retention_logs_client_time_idx")
-  @@index([client_id, rfm_recency, rfm_frequency, rfm_monetary], map: "retention_logs_rfm_idx")
   @@index([client_id, churn_score], map: "retention_logs_client_churn_idx")
-  @@index([client_id, status], map: "retention_logs_client_status_idx")
-  @@index([customer_id, client_id], map: "retention_logs_customer_client_idx")
-  @@index([client_id, timestamp, churn_score], map: "retention_logs_client_timestamp_churn_idx")
-  
   @@map("retention_logs")
 }
 
 model DashboardSnapshot {
-  id          String   @id @default(cuid())
-  type        String   // admin | premium | client
-  subjectId   String?  // null = admin, client_id otherwise
-  version     Int
-  data        Json
-  sizeBytes   Int
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  type      String // admin | premium | client
+  subjectId String? // null = admin, client_id otherwise
+  version   Int
+  data      Json
+  sizeBytes Int
+  createdAt DateTime @default(now())
 
   @@index([type, subjectId, createdAt])
 }
