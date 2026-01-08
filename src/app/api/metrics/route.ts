@@ -32,7 +32,7 @@ export async function GET() {
     // Get database connection status
     let dbConnected = false;
     try {
-      await prisma.$queryRawUnsafe('SELECT 1');
+      await prisma.$queryRaw`SELECT 1`;
       dbConnected = true;
     } catch {
       dbConnected = false;

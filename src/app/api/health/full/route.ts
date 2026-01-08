@@ -33,8 +33,8 @@ export async function GET() {
     let dbResponseTime = 0
     try {
       const dbStart = Date.now()
-      // Use $queryRawUnsafe for compatibility with PrismaPg adapter
-      await prisma.$queryRawUnsafe('SELECT 1')
+      // Use template literal syntax which works with PrismaPg adapter
+      await prisma.$queryRaw`SELECT 1`
       dbResponseTime = Date.now() - dbStart
       dbHealth = true
     } catch (_error) {

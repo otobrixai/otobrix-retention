@@ -7,7 +7,7 @@ export async function GET() {
 
   let db = 'down'
   try {
-    await prisma.$queryRawUnsafe('SELECT 1')
+    await prisma.$queryRaw`SELECT 1`
     db = 'up'
   } catch {}
 
