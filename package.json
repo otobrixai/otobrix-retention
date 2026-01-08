@@ -6,7 +6,6 @@
   "scripts": {
     "lint": "next lint",
     "build": "npm install && npx prisma@6.19.1 generate && next build",
-    "postinstall": "prisma generate",
     "dev": "next dev",
     "start": "next start"
   },
