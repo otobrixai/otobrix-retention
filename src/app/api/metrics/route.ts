@@ -1,7 +1,7 @@
 // src/app/api/metrics/route.ts
 import { otelMetrics } from '@/lib/otel';
 import { cacheManager } from '@/lib/cache/redis';
-import { prisma } from '@/lib/prisma';
+import { Pool } from 'pg';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,9 +32,19 @@ export async function GET() {
     // Get database connection status
     let dbConnected = false;
     try {
-      const { Prisma } = await import('@prisma/client');
-      await prisma.$queryRaw(Prisma.sql`SELECT 1`);
-      dbConnected = true;
+      // Use pool directly to avoid PrismaPg adapter issues
+      const connectionString = process.env.DATABASE_URL_WITH_POOLER || process.env.DATABASE_URL;
+      if (connectionString) {
+        const pool = new Pool({ connectionString, max: 1 });
+        const client = await pool.connect();
+        try {
+          await client.query('SELECT 1');
+          dbConnected = true;
+        } finally {
+          client.release();
+          await pool.end();
+        }
+      }
     } catch {
       dbConnected = false;
     }

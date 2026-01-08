@@ -1,6 +1,5 @@
 // src/lib/db-health.ts
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Pool } from 'pg';
 
 let isConnected = false;
 let lastCheck = 0;
@@ -15,11 +14,20 @@ export async function checkDatabaseHealth() {
   }
 
   try {
-    // Try a simple query to check connection
-    await prisma.$queryRaw(Prisma.sql`SELECT 1`);
-    
-    isConnected = true;
-    lastCheck = now;
+    // Use pool directly to avoid PrismaPg adapter issues with simple queries
+    const connectionString = process.env.DATABASE_URL_WITH_POOLER || process.env.DATABASE_URL;
+    if (connectionString) {
+      const pool = new Pool({ connectionString, max: 1 });
+      const client = await pool.connect();
+      try {
+        await client.query('SELECT 1');
+        isConnected = true;
+        lastCheck = now;
+      } finally {
+        client.release();
+        await pool.end();
+      }
+    }
     
     return { 
       healthy: true, 

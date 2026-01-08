@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 import { cacheManager } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { Pool } from 'pg'
 
 function getMemoryUsage() {
   const usage = process.memoryUsage()
@@ -34,10 +34,20 @@ export async function GET() {
     let dbResponseTime = 0
     try {
       const dbStart = Date.now()
-      // Use Prisma.sql for compatibility with PrismaPg adapter
-      await prisma.$queryRaw(Prisma.sql`SELECT 1`)
-      dbResponseTime = Date.now() - dbStart
-      dbHealth = true
+      // Use pool directly to avoid PrismaPg adapter issues with simple queries
+      const connectionString = process.env.DATABASE_URL_WITH_POOLER || process.env.DATABASE_URL
+      if (connectionString) {
+        const pool = new Pool({ connectionString, max: 1 })
+        const client = await pool.connect()
+        try {
+          await client.query('SELECT 1')
+          dbResponseTime = Date.now() - dbStart
+          dbHealth = true
+        } finally {
+          client.release()
+          await pool.end()
+        }
+      }
     } catch (_error) {
       dbHealth = false
     }
