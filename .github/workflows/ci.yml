@@ -39,7 +39,11 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
         run: |
-          npm run start:ci & sleep 4
+          if [ -f ".next/standalone/server.js" ]; then
+            node .next/standalone/server.js -p 3000 & sleep 4
+          else
+            npm run start:ci & sleep 4
+          fi
           node scripts/smoke/health-check.js || true
           node scripts/smoke/csrf-test.js || true
           node scripts/smoke/rate-limit-test.js || true

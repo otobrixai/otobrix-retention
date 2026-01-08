@@ -15,7 +15,7 @@ export async function checkDatabaseHealth() {
 
   try {
     // Try a simple query to check connection
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$queryRawUnsafe('SELECT 1');
     
     isConnected = true;
     lastCheck = now;
