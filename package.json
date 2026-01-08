@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "lint": "next lint",
-    "build": "npm install && npx prisma@6.19.1 generate && next build",
+    "build": "npm install --include=dev && npx prisma@6.19.1 generate && next build",
     "dev": "next dev",
     "start": "next start"
   },
