@@ -32,7 +32,8 @@ export async function GET() {
     // Get database connection status
     let dbConnected = false;
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      const { Prisma } = await import('@prisma/client');
+      await prisma.$queryRaw(Prisma.sql`SELECT 1`);
       dbConnected = true;
     } catch {
       dbConnected = false;
