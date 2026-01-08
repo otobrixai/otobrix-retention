@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { memoryCache } from '@/lib/cache/memory-cache'
+import { Prisma } from '@prisma/client'
 
 export async function GET() {
   const start = Date.now()
 
   let db = 'down'
   try {
-    await prisma.$queryRaw`SELECT 1`
+    await prisma.$queryRaw(Prisma.sql`SELECT 1`)
     db = 'up'
   } catch {}
 

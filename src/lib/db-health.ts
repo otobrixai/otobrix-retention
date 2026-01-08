@@ -1,5 +1,6 @@
 // src/lib/db-health.ts
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 let isConnected = false;
 let lastCheck = 0;
@@ -15,7 +16,7 @@ export async function checkDatabaseHealth() {
 
   try {
     // Try a simple query to check connection
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$queryRaw(Prisma.sql`SELECT 1`);
     
     isConnected = true;
     lastCheck = now;
