@@ -30,7 +30,10 @@ jobs:
         run: pnpm exec prisma generate
 
       - name: Lint
-        run: pnpm exec next lint || true
+        continue-on-error: true
+        run: |
+          cd ${{ github.workspace }}
+          pnpm exec next lint . || true
 
       - name: Typecheck
         run: pnpm exec tsc --noEmit || true
