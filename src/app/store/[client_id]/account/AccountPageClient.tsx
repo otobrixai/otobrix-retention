@@ -188,7 +188,7 @@ export default function AccountPageClient({
           </Button>
 
           <p className="text-xs text-slate-500 mt-4 text-center">
-            Advanced features (SMS alerts, auto-campaigns, branding) available on upgraded plans
+            Advanced features (SMS alerts, auto-campaigns, branding, etc.) will be available soon.
           </p>
         </div>
       </div>
