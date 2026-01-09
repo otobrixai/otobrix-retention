@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate Snapshot
+        id: snapshot
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
@@ -21,12 +22,10 @@ jobs:
           
           # Save response for error handling
           echo "$BODY" > response.json
-          echo "HTTP_CODE=$HTTP_CODE" >> $GITHUB_ENV
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
           
           # Check if failed
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "FAILED=true" >> $GITHUB_ENV
-            echo "ERROR_RESPONSE=$BODY" >> $GITHUB_ENV
             echo "❌ Snapshot failed with HTTP $HTTP_CODE"
             exit 1
           fi
@@ -46,7 +45,7 @@ jobs:
           
           Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
           Error: $ERROR_MSG
-          HTTP Code: ${{ env.HTTP_CODE }}
+          HTTP Code: ${{ steps.snapshot.outputs.http_code }}
           
           Action required: Check logs immediately"
           
