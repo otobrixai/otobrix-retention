@@ -140,7 +140,7 @@ export default function DashboardClient({ initialData }: { initialData: ClientDa
   const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ['notifications', clientId],
     queryFn: async () => {
-      const res = await fetch(`/api/client/${clientId}/notifications`)
+      const res = await fetch(`/api/client/notifications`)
       if (!res.ok) throw new Error('Failed to load notifications')
       return res.json()
     },
