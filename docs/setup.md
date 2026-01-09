@@ -15,7 +15,7 @@ Clone the repository using Git. Navigate to your desired directory and run the g
 
 ### 2. Install Dependencies
 
-Run the npm install command to install all project dependencies.
+Run the pnpm install command to install all project dependencies.
 
 ### 3. Configure Environment Variables
 
@@ -105,33 +105,33 @@ TEST_BASE_URL="<http://localhost:3000>"
 
 The project includes a comprehensive testing system. Run infrastructure tests to verify database connections, cache systems, and RFM views:
 
-npm run test:infrastructure - Run all infrastructure tests
-npm run test:env - Test environment variables
-npm run test:db - Test database connection
-npm run test:cache - Test cache system
-npm run test:rfm - Test RFM materialized view
+pnpm run test:infrastructure - Run all infrastructure tests
+pnpm run test:env - Test environment variables
+pnpm run test:db - Test database connection
+pnpm run test:cache - Test cache system
+pnpm run test:rfm - Test RFM materialized view
 
 ### Smoke Tests
 
 Smoke tests require the development server to be running. These test API endpoints and functionality:
 
-npm run smoke:all - Run all smoke tests
-npm run smoke:health - Test health endpoints
-npm run smoke:metrics - Test metrics endpoint
-npm run smoke:csrf - Test CSRF protection
-npm run smoke:rate-limit - Test rate limiting
-npm run smoke:sentry - Test Sentry configuration
+pnpm run smoke:all - Run all smoke tests
+pnpm run smoke:health - Test health endpoints
+pnpm run smoke:metrics - Test metrics endpoint
+pnpm run smoke:csrf - Test CSRF protection
+pnpm run smoke:rate-limit - Test rate limiting
+pnpm run smoke:sentry - Test Sentry configuration
 
 ### Combined Test Suites
 
-npm run test:all-suites - Run infrastructure and smoke tests
-npm run test:full - Run unit, infrastructure, and smoke tests
+pnpm run test:all-suites - Run infrastructure and smoke tests
+pnpm run test:full - Run unit, infrastructure, and smoke tests
 
 ### Database Operations
 
-npm run db:refresh-rfm - Refresh RFM materialized view
-npm run db:test-data - Create test data
-npm run db:check-rfm - Check RFM view status
+pnpm run db:refresh-rfm - Refresh RFM materialized view
+pnpm run db:test-data - Create test data
+pnpm run db:check-rfm - Check RFM view status
 
 ## Production Build
 
@@ -149,16 +149,16 @@ Start the production server after building.
 
 ## Development Commands
 
-npm run dev - Start development server
-npm run build - Create production build
-npm run start - Start production server
-npm run lint - Run ESLint code analysis
-npm run lint:fix - Fix auto-fixable linting issues
-npm run db:reset - Reset database (development only)
-npm run db:setup - Setup database schema
-npm run optimize - Analyze build optimization
-npm run clear-cache - Clear problematic cache entries
-npm run worker - Start background worker
+pnpm run dev - Start development server
+pnpm run build - Create production build
+pnpm run start - Start production server
+pnpm run lint - Run ESLint code analysis
+pnpm run lint:fix - Fix auto-fixable linting issues
+pnpm run db:reset - Reset database (development only)
+pnpm run db:setup - Setup database schema
+pnpm run optimize - Analyze build optimization
+pnpm run clear-cache - Clear problematic cache entries
+pnpm run worker - Start background worker
 
 ## Docker Setup (Optional)
 
@@ -190,9 +190,9 @@ Check if port 3000 is occupied by another process and free it if necessary.
 
 Reset the database in development or validate the Prisma schema. Regenerate the Prisma client if needed.
 
-**npm Install Issues*
+**pnpm Install Issues*
 
-Clear npm cache and reinstall dependencies if you encounter installation problems.
+Clear pnpm cache and reinstall dependencies if you encounter installation problems.
 
 ### Development Tools
 

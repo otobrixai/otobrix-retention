@@ -12,10 +12,10 @@
 ### Manual Deployment
 
 Build the application
-npm run build
+pnpm run build
 
 Start production server
-npm start
+pnpm start
 
 ## Environment Configuration
 
@@ -30,7 +30,7 @@ SENTRY_DSN=your_sentry_dsn
 ### Vercel-Specific Settings
 
 1. Set Node.js version to 18+
-2. Configure build command: `npm run build`
+2. Configure build command: `pnpm run build`
 3. Set output directory: `.next`
 4. Configure serverless functions region
 
@@ -49,20 +49,20 @@ The project includes GitHub Actions workflow for:
 
 Run migrations
 
-npx prisma migrate deploy
+pnpm exec prisma migrate deploy
 
 Generate Prisma client
-npx prisma generate
+pnpm exec prisma generate
 
 ### Rollback Procedures
 
 Check migration history:
 
-npx prisma migrate status
+pnpm exec prisma migrate status
 
 Rollback last migration:
 
-npx prisma migrate resolve --rolled-back "migration_name"
+pnpm exec prisma migrate resolve --rolled-back "migration_name"
 
 For emergency rollbacks, use database backup:
 

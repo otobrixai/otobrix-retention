@@ -73,7 +73,7 @@ async function runHealthCheck() {
     
     if (error.code === 'ECONNREFUSED') {
       console.error('💡 Is the server running?');
-      console.error('   Run: npm run dev');
+      console.error('   Run: pnpm run dev');
       console.error('   Or set TEST_BASE_URL environment variable');
     }
     

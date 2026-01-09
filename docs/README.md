@@ -30,15 +30,15 @@ For detailed documentation, please visit the [docs directory](./docs/README.md).
 ```bash
 git clone https://github.com/your-username/otobrix-retention.git
 cd otobrix-retention
-npm install
+pnpm install
 cp .env.example .env.local
 # Edit .env.local with your values
-npx prisma db push
-npm run db:seed
-npm run dev
+pnpm exec prisma db push
+pnpm run db:seed
+pnpm run dev
 
 # generate snapshots manually
 cd C:\Users\mdmho\otobrix-retention
-npx tsx scripts/generate-admin-snapshot.ts
+pnpm exec tsx scripts/generate-admin-snapshot.ts
 
 

@@ -74,7 +74,7 @@ NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn_here
 
 Build with source maps:
 
-npm run build
+pnpm run build
 
 Upload source maps to Sentry:
 

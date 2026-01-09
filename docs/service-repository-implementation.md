@@ -27,4 +27,4 @@ Extracted business logic from controllers into service/repository layers for bet
 ### 1. Build Test
 
 ```bash
-npm run build
+pnpm run build

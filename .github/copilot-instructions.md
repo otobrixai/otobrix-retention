@@ -20,15 +20,15 @@
 - **Type Safety:** Typescript throughout; domain types in `src/domain/*/*.types.ts`.
 
 ## Developer Workflows
-- **Build:** `npm run build` (runs Prisma generate, then Next.js build)
-- **Dev:** `npm run dev`
-- **Lint:** `npm run lint`
-- **Test:** `npm run test` (runs Vitest on `__tests__/secure.test.ts`)
-- **Integration Tests:** `npm run test -- --testPathPattern=service`
-- **DB Setup:** `npx prisma db push && npx prisma generate`
-- **DB Reset:** `npm run db:reset`
-- **Seed DB:** `npm run db:seed`
-- **Snapshots:** `npx tsx scripts/generate-admin-snapshot.ts`
+- **Build:** `pnpm run build` (runs Prisma generate, then Next.js build)
+- **Dev:** `pnpm run dev`
+- **Lint:** `pnpm run lint`
+- **Test:** `pnpm run test` (runs Vitest on `__tests__/secure.test.ts`)
+- **Integration Tests:** `pnpm run test -- --testPathPattern=service`
+- **DB Setup:** `pnpm exec prisma db push && pnpm exec prisma generate`
+- **DB Reset:** `pnpm run db:reset`
+- **Seed DB:** `pnpm run db:seed`
+- **Snapshots:** `pnpm exec tsx scripts/generate-admin-snapshot.ts`
 - **Smoke/Load Tests:** See scripts in `scripts/` (e.g., `k6:smoke`, `smoke:csrf`)
 
 
@@ -54,7 +54,7 @@
 ## Examples
 - To add a new business rule: implement in `*.service.ts`, not in controllers.
 - To add a new API endpoint: create route in `src/app/api/`, call service layer.
-- For DB changes: update `prisma/schema.prisma`, run `npx prisma db push`.
+- For DB changes: update `prisma/schema.prisma`, run `pnpm exec prisma db push`.
 - To update dashboard data logic: modify snapshot adaptation in `DashboardService` and/or snapshot fetch in `src/app/api/dashboard/snapshot/[client_id]/route.ts`.
 - To change notification rules: update `src/domain/notifications/deriveNotifications.ts`.
 - To refresh RFM data: see advisory lock/materialized view logic in `scripts/refresh-rfm-view.ts`.

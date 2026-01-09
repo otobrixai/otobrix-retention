@@ -112,7 +112,7 @@ async function testMetricsEndpoint() {
     if (error.name === 'AbortError') {
       logger.error('Request timed out after 10 seconds');
     } else if (error.code === 'ECONNREFUSED') {
-      logger.error('\n⚠️  Is the server running? Start with: npm run dev');
+      logger.error('\n⚠️  Is the server running? Start with: pnpm run dev');
       logger.error(`   Expected server at: ${baseUrl}`);
     } else {
       logger.error('Stack:', error.stack);

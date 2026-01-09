@@ -48,7 +48,7 @@ async function testMetrics() {
       console.error('Request timed out after 5 seconds');
     } else if (error.code === 'ECONNREFUSED') {
       console.error('Connection refused - is the server running?');
-      console.error('Run: npm run dev');
+      console.error('Run: pnpm run dev');
     }
     
     return false;

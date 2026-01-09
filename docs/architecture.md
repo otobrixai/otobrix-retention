@@ -50,17 +50,17 @@ Business logic has been extracted from controllers into service/repository layer
 
 ### 1. Build Test
 
-npm run build
+pnpm run build
 
 ### 2. Test Execution
 
-npm run test
+pnpm run test
 
 ### 3. Integration Tests
 
 Run specific integration tests for service layer:
 
-npm run test -- --testPathPattern=service
+pnpm run test -- --testPathPattern=service
 
 ## Benefits
 
