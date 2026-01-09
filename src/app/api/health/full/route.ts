@@ -2,7 +2,7 @@
 // src/app/api/health/full/route.ts - Fixed version
 import { NextResponse } from 'next/server'
 import { cacheManager } from '@/lib/cache'
-import { prisma } from '@/lib/prisma'
+// prisma not needed - using Pool directly for health check
 import { Pool } from 'pg'
 
 function getMemoryUsage() {

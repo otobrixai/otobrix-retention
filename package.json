@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "npx prisma@6.19.1 generate && next build",
     "dev": "next dev",
     "start": "next start",

@@ -12,6 +12,35 @@ export default [
         ...globals.node,
         ...globals.browser,
       },
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+    },
+  },
+  
+  // JSX files (React components)
+  {
+    files: ['**/*.jsx'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -27,6 +56,9 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
       globals: {
         ...globals.browser,

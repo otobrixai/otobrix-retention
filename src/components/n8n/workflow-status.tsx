@@ -18,6 +18,13 @@ interface Workflow {
   progress?: number
 }
 
+interface Activity {
+  id: string | number
+  campaignVariant?: string
+  status?: string
+  timestamp: string
+}
+
 export function WorkflowStatus({ clientId }: WorkflowStatusProps) {
   const [workflows, setWorkflows] = useState<Workflow[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -40,9 +47,9 @@ export function WorkflowStatus({ clientId }: WorkflowStatusProps) {
         const data = await response.json()
         // Transform recent activity into workflow-like structure
         const recentCampaigns = data.recentActivity
-          ?.filter((activity: any) => activity.campaignVariant)
+          ?.filter((activity: Activity) => activity.campaignVariant)
           .slice(0, 5)
-          .map((activity: any, index: number) => ({
+          .map((activity: Activity, index: number) => ({
             id: `wf_${activity.id}`,
             name: activity.campaignVariant || `Campaign ${index + 1}`,
             status: activity.status === 'completed' ? 'completed' as const : 

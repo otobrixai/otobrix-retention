@@ -20,7 +20,7 @@ interface AccountPageClientProps {
 }
 
 export default function AccountPageClient({ 
-  clientId, 
+  clientId: _clientId, 
   initialPreferences 
 }: AccountPageClientProps) {
   const router = useRouter();
