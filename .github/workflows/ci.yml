@@ -27,7 +27,8 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint
-        run: pnpm run lint || true
+        working-directory: ${{ github.workspace }}
+        run: pnpm exec next lint || true
 
       - name: Typecheck
         run: pnpm exec tsc --noEmit || true
