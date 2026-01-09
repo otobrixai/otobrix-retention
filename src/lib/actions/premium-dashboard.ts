@@ -136,36 +136,53 @@ async function fetchRFMAggregatedData(clientId: string): Promise<{
   stats: AggregatedStats;
   mode: 'precise' | 'estimated';
 }> {
-  // Try materialized view first
+  // Check if materialized view exists first to avoid errors
   try {
-    const rfmResult = await prisma.$queryRaw<RFMViewStats[]>`
-      SELECT 
-        COUNT(*) as total_customers,
-        COALESCE(AVG(churn_score)::float, 0) as avg_churn_score,
-        COUNT(CASE WHEN customer_segment = 'At Risk' THEN 1 END) as at_risk_count,
-        COUNT(CASE WHEN customer_segment = 'High Value' THEN 1 END) as high_value_count,
-        COUNT(CASE WHEN customer_segment = 'Regular' THEN 1 END) as regular_count,
-        COUNT(CASE WHEN customer_segment = 'Recent Customers' THEN 1 END) as recent_count,
-        COALESCE(SUM(total_spent), 0) as total_revenue,
-        MAX(calculated_at) as last_updated
-      FROM rfm_scores_mv
-      WHERE client_id = ${clientId}
-      LIMIT 1
+    const viewExists = await prisma.$queryRaw<Array<{ exists: boolean }>>`
+      SELECT EXISTS(
+        SELECT FROM pg_matviews 
+        WHERE schemaname = 'public' 
+        AND matviewname = 'rfm_scores_mv'
+      ) as exists
     `;
     
-    const stats = rfmResult[0];
-    if (stats) {
-      // Check if view is stale (>36 hours old)
-      const viewAge = stats.last_updated ? Date.now() - new Date(stats.last_updated).getTime() : Infinity;
-      const isStale = viewAge > 36 * 60 * 60 * 1000;
-      
-      return {
-        stats,
-        mode: isStale ? 'estimated' : 'precise'
-      };
+    if (viewExists[0]?.exists) {
+      // View exists, try to query it
+      try {
+        const rfmResult = await prisma.$queryRaw<RFMViewStats[]>`
+          SELECT 
+            COUNT(*) as total_customers,
+            COALESCE(AVG(churn_score)::float, 0) as avg_churn_score,
+            COUNT(CASE WHEN customer_segment = 'At Risk' THEN 1 END) as at_risk_count,
+            COUNT(CASE WHEN customer_segment = 'High Value' THEN 1 END) as high_value_count,
+            COUNT(CASE WHEN customer_segment = 'Regular' THEN 1 END) as regular_count,
+            COUNT(CASE WHEN customer_segment = 'Recent Customers' THEN 1 END) as recent_count,
+            COALESCE(SUM(total_spent), 0) as total_revenue,
+            MAX(calculated_at) as last_updated
+          FROM rfm_scores_mv
+          WHERE client_id = ${clientId}
+          LIMIT 1
+        `;
+        
+        const stats = rfmResult[0];
+        if (stats) {
+          // Check if view is stale (>36 hours old)
+          const viewAge = stats.last_updated ? Date.now() - new Date(stats.last_updated).getTime() : Infinity;
+          const isStale = viewAge > 36 * 60 * 60 * 1000;
+          
+          return {
+            stats,
+            mode: isStale ? 'estimated' : 'precise'
+          };
+        }
+      } catch (error) {
+        // View exists but query failed - use fallback
+        console.warn('Materialized view query failed, using fallback:', error);
+      }
     }
   } catch (error) {
-    console.warn('Materialized view query failed, using fallback:', error);
+    // View existence check failed - use fallback
+    console.warn('Could not check materialized view existence, using fallback:', error);
   }
   
   // IMPROVED FALLBACK: Use 365-day window
