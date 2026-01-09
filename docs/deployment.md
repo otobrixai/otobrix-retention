@@ -30,9 +30,10 @@ SENTRY_DSN=your_sentry_dsn
 ### Vercel-Specific Settings
 
 1. Set Node.js version to 18+
-2. Configure build command: `pnpm run build`
+2. Configure build command: `pnpm run build` (or leave default - it will use the build script from package.json)
 3. Set output directory: `.next`
 4. Configure serverless functions region
+5. **For pnpm support**: The project includes `vercel.json` which configures Vercel to use pnpm. If you encounter issues, you can also set the environment variable `ENABLE_EXPERIMENTAL_COREPACK=1` in your Vercel project settings.
 
 ## GitHub Actions CI/CD
 
