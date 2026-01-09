@@ -562,6 +562,18 @@ export default function DashboardClient({ initialData }: { initialData: ClientDa
                         <Settings size={16} />
                         <span>Settings</span>
                       </button>
+
+                      <button
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
+                        role="menuitem"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          router.push(`/store/${clientId}/account`);
+                        }}
+                      >
+                        <Bell size={16} />
+                        <span>Account Preferences</span>
+                      </button>
                     </div>
 
                     {/* Sign Out */}
