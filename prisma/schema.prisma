@@ -19,20 +19,23 @@ model admin_users {
 }
 
 model clients {
-  client_id      String           @id @default(cuid())
-  company_name   String?
-  client_name    String
-  email          String           @unique
-  status         String           @default("active")
-  api_key        String?
-  n8n_base_url   String?
-  agency_id      String?
-  created_at     DateTime         @default(now())
-  updated_at     DateTime         @updatedAt
-  setup_status   String           @default("pending")
-  client_users   client_users[]
-  retention_logs retention_logs[]
-  rfm_config     rfm_configs?
+  client_id          String              @id @default(cuid())
+  company_name       String?
+  client_name        String
+  email              String              @unique
+  status             String              @default("active")
+  api_key            String?
+  n8n_base_url       String?
+  agency_id          String?
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+  setup_status       String              @default("pending")
+  
+  client_users       client_users[]
+  retention_logs     retention_logs[]
+  rfm_config         rfm_configs?
+  
+  client_preferences ClientPreferences?  @relation("ClientPreferencesToClients")
 }
 
 model rfm_configs {
@@ -108,4 +111,20 @@ model DashboardSnapshot {
   createdAt DateTime @default(now())
 
   @@index([type, subjectId, createdAt])
+}
+
+model ClientPreferences {
+  id                  String   @id @default(cuid())
+  client_id           String   @unique
+
+  ai_risk_alerts      Boolean  @default(true)
+  weekly_report       Boolean  @default(true)
+  email_notifications Boolean  @default(true)
+
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  client              clients  @relation("ClientPreferencesToClients", fields: [client_id], references: [client_id], onDelete: Cascade)
+
+  @@map("client_preferences")
 }
