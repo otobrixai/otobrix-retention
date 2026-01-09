@@ -26,8 +26,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate
+
       - name: Lint
-        working-directory: ${{ github.workspace }}
         run: pnpm exec next lint || true
 
       - name: Typecheck
