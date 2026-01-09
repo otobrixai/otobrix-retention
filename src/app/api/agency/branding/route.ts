@@ -1,4 +1,4 @@
-﻿// src/app/api/agency/branding/route.ts
+// src/app/api/agency/branding/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -14,21 +14,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with actual branding data query
-    // const branding = await prisma.agency_branding.findUnique({
-    //   where: { agency_id: agencyId }
-    // });
-
-    // For now, return mock data
-    const mockBranding = {
+    // Note: agency_branding table doesn't exist in schema
+    // Return default/empty branding data
+    const branding = {
       agency_id: agencyId,
-      logo_url: '/images/default-logo.png',
+      logo_url: null,
       primary_color: '#3B82F6',
       secondary_color: '#1E40AF',
-      company_name: 'Demo Agency'
+      company_name: null
     };
 
-    return NextResponse.json(mockBranding);
+    return NextResponse.json(branding);
 
   } catch (error: unknown) {
     console.error('❌ Error fetching branding:', error);

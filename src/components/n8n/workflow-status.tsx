@@ -32,35 +32,35 @@ export function WorkflowStatus({ clientId }: WorkflowStatusProps) {
 
   const fetchWorkflows = async () => {
     try {
-      // This would be a real API call in production
-      // For now, simulate some data
-      const simulatedWorkflows: Workflow[] = [
-        {
-          id: 'wf_1',
-          name: 'Win-back Campaign',
-          status: Math.random() > 0.7 ? 'running' : 'completed',
-          startTime: new Date(Date.now() - 300000).toISOString(),
-          duration: 120,
-          progress: 75
-        },
-        {
-          id: 'wf_2',
-          name: 'Segment Refresh',
-          status: 'completed',
-          startTime: new Date(Date.now() - 600000).toISOString(),
-          duration: 45
-        },
-        {
-          id: 'wf_3',
-          name: 'Email Broadcast',
-          status: 'pending',
-          startTime: new Date().toISOString()
-        }
-      ]
+      // Query real workflow/campaign data from retention_logs
+      // Recent campaigns with actions can represent active workflows
+      const response = await fetch(`/api/client/dashboard`)
       
-      setWorkflows(simulatedWorkflows)
+      if (response.ok) {
+        const data = await response.json()
+        // Transform recent activity into workflow-like structure
+        const recentCampaigns = data.recentActivity
+          ?.filter((activity: any) => activity.campaignVariant)
+          .slice(0, 5)
+          .map((activity: any, index: number) => ({
+            id: `wf_${activity.id}`,
+            name: activity.campaignVariant || `Campaign ${index + 1}`,
+            status: activity.status === 'completed' ? 'completed' as const : 
+                   activity.status === 'pending' ? 'pending' as const : 'running' as const,
+            startTime: activity.timestamp,
+            duration: undefined,
+            progress: undefined
+          })) || []
+        
+        setWorkflows(recentCampaigns)
+      } else {
+        // If API fails, return empty array
+        setWorkflows([])
+      }
     } catch (error) {
       console.error('Failed to fetch workflows:', error)
+      // Return empty array on error
+      setWorkflows([])
     } finally {
       setIsLoading(false)
     }

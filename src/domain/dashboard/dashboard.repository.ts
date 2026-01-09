@@ -115,15 +115,105 @@ export class DashboardRepository {
     };
   }
 
-  async getRFMSegments(_clientId: string): Promise<RFMSegment[]> {
-    // Note: clientId parameter renamed with underscore to indicate it's intentionally unused
-    // Fallback sample data - in production, this would query the materialized view
-    return [
-      { recency: 1, frequency: 1, monetary: 1, count: 150, label: 'Hibernating', revenue: 45000 },
-      { recency: 5, frequency: 5, monetary: 5, count: 80, label: 'Champions', revenue: 120000 },
-      { recency: 2, frequency: 4, monetary: 3, count: 200, label: 'At Risk', revenue: 75000 },
-      { recency: 4, frequency: 2, monetary: 4, count: 120, label: 'Loyal', revenue: 90000 },
-    ];
+  async getRFMSegments(clientId: string): Promise<RFMSegment[]> {
+    try {
+      // First try to query from materialized view if it exists
+      const viewExists = await prisma.$queryRaw<Array<{ exists: boolean }>>`
+        SELECT EXISTS(
+          SELECT FROM pg_matviews 
+          WHERE schemaname = 'public' 
+          AND matviewname = 'rfm_scores_mv'
+        ) as exists
+      `;
+
+      if (viewExists[0]?.exists) {
+        try {
+          const rfmSegments = await prisma.$queryRaw<Array<{
+            rfm_recency: number;
+            rfm_frequency: number;
+            rfm_monetary: number;
+            count: bigint;
+            customer_segment: string;
+            total_revenue: number;
+          }>>`
+            SELECT 
+              COALESCE(AVG(rfm_recency)::float, 0) as rfm_recency,
+              COALESCE(AVG(rfm_frequency)::float, 0) as rfm_frequency,
+              COALESCE(AVG(rfm_monetary)::float, 0) as rfm_monetary,
+              COUNT(*)::bigint as count,
+              COALESCE(customer_segment, 'Unknown') as customer_segment,
+              COALESCE(SUM(total_spent)::float, 0) as total_revenue
+            FROM rfm_scores_mv
+            WHERE client_id = ${clientId}
+            GROUP BY customer_segment, 
+                     FLOOR(COALESCE(rfm_recency, 0)),
+                     FLOOR(COALESCE(rfm_frequency, 0)),
+                     FLOOR(COALESCE(rfm_monetary, 0))
+            ORDER BY total_revenue DESC
+          `;
+
+          if (rfmSegments.length > 0) {
+            return rfmSegments.map(seg => ({
+              recency: Math.round(seg.rfm_recency),
+              frequency: Math.round(seg.rfm_frequency),
+              monetary: Math.round(seg.rfm_monetary),
+              count: Number(seg.count),
+              label: seg.customer_segment || 'Unknown',
+              revenue: seg.total_revenue
+            }));
+          }
+        } catch (error) {
+          console.warn('Materialized view query failed, using retention_logs fallback:', error);
+        }
+      }
+
+      // Fallback: Query from retention_logs
+      const rfmSegments = await prisma.$queryRaw<Array<{
+        rfm_recency: number;
+        rfm_frequency: number;
+        rfm_monetary: number;
+        count: bigint;
+        customer_segment: string;
+        total_revenue: number;
+      }>>`
+        SELECT 
+          COALESCE(AVG(rfm_recency)::float, 0) as rfm_recency,
+          COALESCE(AVG(rfm_frequency)::float, 0) as rfm_frequency,
+          COALESCE(AVG(rfm_monetary)::float, 0) as rfm_monetary,
+          COUNT(*)::bigint as count,
+          COALESCE(customer_segment, 'Unknown') as customer_segment,
+          COALESCE(SUM(total_spent)::float, 0) as total_revenue
+        FROM retention_logs
+        WHERE client_id = ${clientId}
+          AND timestamp >= NOW() - INTERVAL '365 days'
+          AND rfm_recency IS NOT NULL
+          AND rfm_frequency IS NOT NULL
+          AND rfm_monetary IS NOT NULL
+        GROUP BY customer_segment,
+                 FLOOR(COALESCE(rfm_recency, 0)),
+                 FLOOR(COALESCE(rfm_frequency, 0)),
+                 FLOOR(COALESCE(rfm_monetary, 0))
+        ORDER BY total_revenue DESC
+        LIMIT 20
+      `;
+
+      if (rfmSegments.length > 0) {
+        return rfmSegments.map(seg => ({
+          recency: Math.round(seg.rfm_recency),
+          frequency: Math.round(seg.rfm_frequency),
+          monetary: Math.round(seg.rfm_monetary),
+          count: Number(seg.count),
+          label: seg.customer_segment || 'Unknown',
+          revenue: seg.total_revenue
+        }));
+      }
+
+      // Return empty array if no data found
+      return [];
+    } catch (error) {
+      console.error('Error fetching RFM segments:', error);
+      return [];
+    }
   }
 
   // Admin dashboard queries
