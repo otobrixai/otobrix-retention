@@ -90,7 +90,7 @@ export default function SetPasswordPageContent() {
       if (response.ok) {
         // Redirect to login or dashboard
         alert('Password set successfully! You can now login.')
-        router.push('/login')
+        router.push('/')
       } else {
         setError(data.error || 'Failed to set password')
       }
@@ -125,7 +125,7 @@ export default function SetPasswordPageContent() {
             <h2 className="text-3xl font-bold text-gray-900">Invalid Link</h2>
             <p className="text-gray-600 mt-2">{error}</p>
             <button 
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/')}
               className="mt-6 bg-blue-600 text-white py-2 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
             >
               Go to Login
