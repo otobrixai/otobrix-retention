@@ -99,13 +99,13 @@ export default function AccountDetailPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send email');
+        throw new Error(errorData.error || 'Failed to send access email');
       }
 
-      const _result = await response.json();
-      alert('Access email sent successfully!');
+      const result = await response.json();
+      alert(`Dashboard access email sent! ${result.emailSent ? 'User can now set their password.' : 'Check logs for temporary password.'}`);
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to send email');
+      alert(error instanceof Error ? error.message : 'Failed to send access email');
     } finally {
       setSendingEmail(false);
       setShowEmailModal(false);

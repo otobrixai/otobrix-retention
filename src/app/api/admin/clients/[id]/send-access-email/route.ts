@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
+import bcrypt from 'bcryptjs'
 
 // Safe initialization of Resend
 const resendApiKey = process.env.RESEND_API_KEY
@@ -62,6 +63,14 @@ export async function POST(
         { status: 400 }
       )
     }
+    // Generate a temporary password
+    const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    const passwordHash = await bcrypt.hash(tempPassword, 12);
+
+    await prisma.client_users.updateMany({
+      where: { client_id: clientId, is_active: true },
+      data: { password_hash: passwordHash, requires_password_change: true }
+    }); 
 
     const clientUser = client.client_users[0]
     const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password`
@@ -80,7 +89,7 @@ export async function POST(
         <p>Use your email: <strong>${clientUser.email}</strong> to set your password.</p>
         <p><strong>Important:</strong> You must set your password before you can access your dashboard.</p>
         <br>
-        <p>Best regards,<br>Your Team</p>
+        <p>Best regards,<br>OtobrixAI Support Team</p>
       </div>
       `,
     })

@@ -69,7 +69,7 @@ export async function POST(
       }
     })
 
-    console.info(`Password reset for client: ${clientId}, temp password: ${tempPassword}`)
+    console.info(`Password reset for client: ${clientId}`)
 
     let emailSent = false
     // Send email with temporary password only if Resend is configured
@@ -84,15 +84,11 @@ export async function POST(
             <div>
               <h2>Password Reset Request</h2>
               <p>Hello ${client.client_name},</p>
-              <p>Your password has been reset. Here is your temporary password:</p>
-              <p style="background-color: #f3f4f6; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 16px; font-weight: bold;">
-                ${tempPassword}
-              </p>
-              <p>Please use this temporary password to log in and set a new password immediately:</p>
+              <p>Your password has been reset. Click the button below to set a new password:</p>
               <p><a href="${setupPasswordUrl}" style="background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Set New Password</a></p>
-              <p><strong>Security Note:</strong> For security reasons, please change your password immediately after logging in.</p>
+              <p><strong>Note:</strong> This link will expire in 24 hours.</p>
               <br>
-              <p>Best regards,<br>Your Team</p>
+              <p>Best regards,<br>OtobrixAI Support Team</p>
             </div>
           `,
         })
