@@ -75,7 +75,7 @@ export async function POST(
     // Send email with temporary password only if Resend is configured
     if (resend) {
       try {
-        const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password`
+        const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password?email=${encodeURIComponent(client.client_users[0].email)}`
         const { error } = await resend.emails.send({
           from: 'OtoRetain Pro <support@otobrixai.com>',
           to: client.client_users[0].email,

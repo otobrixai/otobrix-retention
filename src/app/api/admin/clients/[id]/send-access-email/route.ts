@@ -73,7 +73,7 @@ export async function POST(
     }); 
 
     const clientUser = client.client_users[0]
-    const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password`
+    const setupPasswordUrl = `${process.env.NEXTAUTH_URL}/set-password?email=${encodeURIComponent(clientUser.email)}`;
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({

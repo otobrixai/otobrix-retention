@@ -1,83 +1,72 @@
-// src/app/api/client/set-password/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-
-const setPasswordSchema = z.object({
-  newPassword: z.string().min(8).max(100),
-  confirmPassword: z.string()
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"]
-})
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const session = await auth()
-    
-    if (!session?.user || session.user.type !== 'client') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    const clientId = session.user.clientId
-    const userEmail = session.user.email
-
-    if (!clientId || !userEmail) {
-      return NextResponse.json(
-        { error: 'Client ID or email not found' },
-        { status: 400 }
-      )
-    }
-
-    // Parse and validate request body
     const body = await request.json()
-    const validationResult = setPasswordSchema.safeParse(body)
+    const { email, newPassword, confirmPassword } = body
 
-    if (!validationResult.success) {
+    if (!email || !newPassword || !confirmPassword) {
       return NextResponse.json(
-        { 
-          error: 'Validation failed', 
-          details: validationResult.error.errors 
-        },
+        { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    const { newPassword } = validationResult.data
+    if (newPassword !== confirmPassword) {
+      return NextResponse.json(
+        { error: 'Passwords do not match' },
+        { status: 400 }
+      )
+    }
 
-    // Update client user password AND set requires_password_change to false
-    const passwordHash = await bcrypt.hash(newPassword, 12)
+    if (newPassword.length < 8) {
+      return NextResponse.json(
+        { error: 'Password must be at least 8 characters' },
+        { status: 400 }
+      )
+    }
 
-    const updatedClientUser = await prisma.client_users.updateMany({
+    // Find client user
+    const clientUser = await prisma.client_users.findFirst({
       where: {
-        client_id: clientId,
-        email: userEmail
-      },
-      data: {
-        password_hash: passwordHash,
-        requires_password_change: false, // ← ADD THIS LINE
-        updated_at: new Date()
+        email: email.toLowerCase().trim(),
+        is_active: true
       }
     })
 
-    if (updatedClientUser.count === 0) {
+    if (!clientUser) {
       return NextResponse.json(
-        { error: 'Client user not found' },
+        { error: 'User not found or inactive' },
         { status: 404 }
       )
     }
 
-    // Return success with a flag to trigger client-side redirect
+    // Verify user is allowed to set password (empty password or requires change)
+    if (clientUser.password_hash && !clientUser.requires_password_change) {
+      return NextResponse.json(
+        { error: 'Password already set. Use forgot password instead.' },
+        { status: 400 }
+      )
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, 12)
+
+    // Update user
+    await prisma.client_users.update({
+      where: { id: clientUser.id },
+      data: {
+        password_hash: passwordHash,
+        requires_password_change: false,
+        updated_at: new Date()
+      }
+    })
+
     return NextResponse.json({
       success: true,
-      message: 'Password set successfully',
-      requiresRedirect: true // ← ADD THIS FLAG
+      message: 'Password set successfully'
     })
 
   } catch (error) {
