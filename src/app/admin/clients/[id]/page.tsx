@@ -71,8 +71,23 @@ export default function AccountDetailPage() {
   const handleEdit = () => router.push(`/admin/clients/${accountId}/edit`);
 
   const handleResetPassword = async () => {
-    setShowPasswordModal(false);
-    // Implementation...
+    try {
+      const response = await fetch(`/api/admin/clients/${accountId}/reset-password`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to reset password');
+      }
+
+      const result = await response.json();
+      alert(`Password reset successfully! ${result.emailSent ? 'Email sent.' : 'Check logs for temporary password.'}`);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to reset password');
+    } finally {
+      setShowPasswordModal(false);
+    }
   };
 
   const handleSendAccessEmail = async () => {
