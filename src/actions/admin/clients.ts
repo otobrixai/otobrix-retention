@@ -37,16 +37,34 @@ export async function createClientAction(formData: FormData) {
     redirect('/admin/clients/new?error=email_already_exists')
   }
 
-  // Create client
-  await prisma.clients.create({
-    data: {
-      client_id: `otobrix_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-      company_name: companyName,
-      client_name: clientName.trim(),
-      email: email.toLowerCase().trim(),
-      status: status as 'active' | 'inactive' | 'suspended',
-      setup_status: 'pending',
-    },
+  // Use transaction to ensure both records are created together
+  await prisma.$transaction(async (tx) => {
+    // Generate client ID
+    const clientId = `otobrix_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+
+    // Create client
+    await tx.clients.create({
+      data: {
+        client_id: clientId,
+        company_name: companyName,
+        client_name: clientName.trim(),
+        email: email.toLowerCase().trim(),
+        status: status as 'active' | 'inactive' | 'suspended',
+        setup_status: 'pending',
+      },
+    })
+
+    // Also create a client_user record for login access
+    await tx.client_users.create({
+      data: {
+        client_id: clientId,
+        email: email.toLowerCase().trim(),
+        password_hash: '', // Empty initially - will be set via password reset
+        role: 'client',
+        is_active: true,
+        requires_password_change: true,
+      },
+    })
   })
 
   // Invalidate cache
