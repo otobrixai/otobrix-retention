@@ -78,7 +78,19 @@ export default function AccountDetailPage() {
   const handleSendAccessEmail = async () => {
     setSendingEmail(true);
     try {
-      // Implementation...
+      const response = await fetch(`/api/admin/clients/${accountId}/send-access-email`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send email');
+      }
+
+      const _result = await response.json();
+      alert('Access email sent successfully!');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to send email');
     } finally {
       setSendingEmail(false);
       setShowEmailModal(false);
