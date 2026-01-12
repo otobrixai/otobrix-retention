@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     // Verify admin authentication
     const session = await auth()
     
-    if (!session?.user || session.user.type !== 'admin') {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
