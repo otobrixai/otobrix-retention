@@ -79,7 +79,7 @@ export async function POST(
         const { error } = await resend.emails.send({
           from: 'OtoRetain Pro <support@otobrixai.com>',
           to: client.client_users[0].email,
-          subject: 'Password Reset - Temporary Password',
+          subject: 'Password Reset Request',
           html: `
             <div>
               <h2>Password Reset Request</h2>

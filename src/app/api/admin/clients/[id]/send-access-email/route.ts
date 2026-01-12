@@ -86,7 +86,6 @@ export async function POST(
         <p>Hello ${client.client_name},</p>
         <p>Your account has been set up. Please set your password using the link below:</p>
         <p><a href="${setupPasswordUrl}" style="background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Set Your Password</a></p>
-        <p>Use your email: <strong>${clientUser.email}</strong> to set your password.</p>
         <p><strong>Important:</strong> You must set your password before you can access your dashboard.</p>
         <br>
         <p>Best regards,<br>OtobrixAI Support Team</p>
