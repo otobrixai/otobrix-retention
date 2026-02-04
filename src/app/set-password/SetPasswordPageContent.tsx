@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff, Key, Mail, Loader2, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, Key, Mail, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 
@@ -122,6 +122,29 @@ export default function SetPasswordPageContent() {
     }
   }
 
+  // If no email param, it's an invalid access attempt
+  if (!emailParam) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-md w-full text-center space-y-6 bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
+          <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+            <AlertTriangle className="text-red-500" size={40} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-900">Access Denied</h2>
+            <p className="text-gray-600">This page can only be accessed via a valid setup link from your email.</p>
+          </div>
+          <button 
+            onClick={() => router.push('/')}
+            className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // If verifying, show loading
   if (verifying) {
     return (
@@ -201,27 +224,7 @@ export default function SetPasswordPageContent() {
             </div>
           )}
 
-          {/* Email Field (only show if not from URL param) */}
-          {!emailParam && (
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Enter your email"
-                  disabled={loading || !!emailParam}
-                />
-              </div>
-            </div>
-          )}
+          {/* Header has already clarified who this is for */}
 
           {/* New Password Field */}
           <div>
