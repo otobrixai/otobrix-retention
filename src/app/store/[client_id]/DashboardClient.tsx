@@ -199,19 +199,30 @@ export default function DashboardClient({ initialData }: { initialData: ClientDa
     setShowWelcomeTooltip(true);
   }, []);
 
-  // Data refresh mutation
+  // Data refresh mutation with cache clearing
   const refreshMutation = useMutation({
-    mutationFn: () => refetch(),
+    mutationFn: async () => {
+      // 1. Force server-side cache invalidation
+      try {
+        await fetch(`/api/dashboard/snapshot/${clientId}?refresh=true`);
+      } catch (e) {
+        console.warn('Cache clear failed, proceeding anyway');
+      }
+      
+      // 2. Clear query client cache and refetch
+      await queryClient.invalidateQueries({ queryKey: ['dashboard', clientId] });
+      return refetch();
+    },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['dashboard', clientId] });
-
       const previousData = queryClient.getQueryData(['dashboard', clientId]);
-
-      queryClient.setQueryData(['dashboard', clientId], (old: DashboardData) => ({
-        ...old,
-        _isRefreshing: true
-      }));
-
+      queryClient.setQueryData(['dashboard', clientId], (old: DashboardData | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          _isRefreshing: true
+        };
+      });
       return { previousData };
     },
     onError: (err, variables, context) => {
@@ -228,6 +239,7 @@ export default function DashboardClient({ initialData }: { initialData: ClientDa
       });
     },
     onSettled: () => {
+      // Final invalidation to be safe
       queryClient.invalidateQueries({ queryKey: ['dashboard', clientId] });
     },
   });
