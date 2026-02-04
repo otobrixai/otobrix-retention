@@ -27,8 +27,11 @@ export default function SetPasswordPageContent() {
   useEffect(() => {
     if (emailParam) {
       verifyUser(emailParam)
+    } else {
+      // If no email param, redirect to login immediately
+      router.replace('/')
     }
-  }, [emailParam])
+  }, [emailParam, router])
 
   const verifyUser = async (userEmail: string) => {
     try {
@@ -122,27 +125,9 @@ export default function SetPasswordPageContent() {
     }
   }
 
-  // If no email param, it's an invalid access attempt
+  // If no email param, show a simple loading/empty state while redirecting
   if (!emailParam) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <div className="max-w-md w-full text-center space-y-6 bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
-          <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-            <AlertTriangle className="text-red-500" size={40} />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">Access Denied</h2>
-            <p className="text-gray-600">This page can only be accessed via a valid setup link from your email.</p>
-          </div>
-          <button 
-            onClick={() => router.push('/')}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    )
+    return null
   }
 
   // If verifying, show loading
