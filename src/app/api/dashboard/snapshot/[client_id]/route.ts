@@ -22,17 +22,17 @@ export async function GET(
     if (forceRefresh) {
       const { invalidateDashboardSnapshot } = await import('@/lib/actions/premium-dashboard');
       await invalidateDashboardSnapshot(client_id);
-      console.log(`[API] Forced refresh for client: ${client_id}`);
+      console.info(`[API] Forced refresh for client: ${client_id}`);
     }
 
     // Use your transition system
     const snapshot = await getPremiumDashboardData(client_id);
     
     // Debug logging for production
-    console.log(`[API] Snapshot fetched for ${client_id}. Stats:`, {
+    console.info(`[API] Snapshot fetched for ${client_id}. Stats:`, {
       totalCustomers: snapshot.analytics.totalCustomers,
       totalRevenue: snapshot.analytics.totalRevenue,
-      cacheHit: snapshot.cacheHit
+      cacheSource: snapshot.cacheSource
     });
 
     const analytics = snapshot.analytics;
@@ -59,7 +59,7 @@ export async function GET(
         aiStatus: 'Active',
         cacheHit: snapshot.cacheSource !== 'fresh'
       },
-      rfmSegments: snapshot.customerSegments.map((seg, idx) => ({
+      rfmSegments: snapshot.customerSegments.map((seg, _idx) => ({
         label: seg.segment,
         count: seg.count,
         recency: Math.floor(Math.random() * 3) + 2,
@@ -68,8 +68,8 @@ export async function GET(
         revenue: Math.round((analytics.totalRevenue / snapshot.customerSegments.length) * (1 + Math.random() * 0.5)),
         aiImpact: 'High High'
       })),
-      aiImpactFeed: recent.map((action, idx) => ({
-        id: idx,
+      aiImpactFeed: recent.map((action, _idx) => ({
+        id: _idx,
         timestamp: action.timestamp ? new Date(action.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently',
         description: action.action === 'purchase' || action.action === 'revenue' 
           ? `High-value customer re-engaged and completed purchase`
