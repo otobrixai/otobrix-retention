@@ -2,7 +2,9 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff, Key, Mail } from 'lucide-react'
+import { Eye, EyeOff, Key, Mail, Loader2, CheckCircle2 } from 'lucide-react'
+import { signIn } from 'next-auth/react'
+import { toast } from 'sonner'
 
 export default function SetPasswordPageContent() {
   const router = useRouter()
@@ -18,6 +20,8 @@ export default function SetPasswordPageContent() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isValidUser, setIsValidUser] = useState(false)
+  const [clientId, setClientId] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   // Verify user when email is provided in URL
   useEffect(() => {
@@ -39,6 +43,7 @@ export default function SetPasswordPageContent() {
       if (data.valid && data.requiresPasswordChange) {
         setIsValidUser(true)
         setEmail(userEmail)
+        setClientId(data.clientId)
       } else {
         setError('This link is no longer valid or password already set')
       }
@@ -88,16 +93,32 @@ export default function SetPasswordPageContent() {
       const data = await response.json()
 
       if (response.ok) {
-        // Redirect to login or dashboard
-        alert('Password set successfully! You can now login.')
-        router.push('/')
+        setSuccess(true)
+        toast.success('Password set successfully!', {
+          description: 'Signing you in...'
+        })
+
+        // Auto sign-in
+        const result = await signIn('credentials', {
+          email,
+          password: newPassword,
+          redirect: false,
+        })
+
+        if (result?.error) {
+          setError('Password set, but auto-login failed. Please login manually.')
+          setTimeout(() => router.push('/'), 3000)
+        } else {
+          // Success! Redirect to dashboard
+          router.push(clientId ? `/store/${clientId}` : '/')
+        }
       } else {
         setError(data.error || 'Failed to set password')
       }
     } catch (_error) {
       setError('An error occurred while setting password')
     } finally {
-      setLoading(false)
+      if (!success) setLoading(false)
     }
   }
 
@@ -130,6 +151,26 @@ export default function SetPasswordPageContent() {
             >
               Go to Login
             </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // If success, show success state
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-md w-full text-center space-y-6 bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
+          <div className="mx-auto w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
+            <CheckCircle2 className="text-emerald-500" size={40} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-900">Success!</h2>
+            <p className="text-gray-600">Your password has been set. We're redirecting you to your dashboard now...</p>
+          </div>
+          <div className="flex justify-center">
+            <Loader2 className="animate-spin text-blue-600" size={24} />
           </div>
         </div>
       </div>
