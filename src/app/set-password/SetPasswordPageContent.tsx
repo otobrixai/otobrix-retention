@@ -182,9 +182,6 @@ export default function SetPasswordPageContent() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg mb-6">
-            <span className="text-white font-bold text-2xl">O</span>
-          </div>
           <h2 className="text-3xl font-bold text-gray-900">
             {emailParam ? 'Set Your Password' : 'Password Setup'}
           </h2>
