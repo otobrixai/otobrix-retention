@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff, Key, Mail, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Eye, EyeOff, Key, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 
