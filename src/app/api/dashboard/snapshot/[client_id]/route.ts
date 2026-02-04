@@ -27,6 +27,14 @@ export async function GET(
 
     // Use your transition system
     const snapshot = await getPremiumDashboardData(client_id);
+    
+    // Debug logging for production
+    console.log(`[API] Snapshot fetched for ${client_id}. Stats:`, {
+      totalCustomers: snapshot.analytics.totalCustomers,
+      totalRevenue: snapshot.analytics.totalRevenue,
+      cacheHit: snapshot.cacheHit
+    });
+
     const analytics = snapshot.analytics;
     const recent = snapshot.recentActions;
 

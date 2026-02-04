@@ -84,8 +84,8 @@ export default function RFMHeatmapInteractive({ data }: { data: DashboardData })
           </div>
         </CardHeader>
         <CardContent>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[320px] min-h-[320px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%" minHeight={320}>
               <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                 <XAxis 
                   type="number" 

@@ -134,8 +134,8 @@ export default function CohortRetentionChart({ data }: { data: DashboardData }) 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-80 relative">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[320px] min-h-[320px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%" minHeight={320}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
                 <XAxis 
